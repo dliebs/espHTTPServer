@@ -1,6 +1,6 @@
 //
-// espHTTP v1.0.2
-// 2023.12.20
+// espHTTP v1.0.3
+// 2024.01.10
 //
 
 /*--------       Libraries        --------*/
@@ -83,11 +83,50 @@ void serverSetup() {
   server.begin();
 }
 
+#ifdef BASICPAGE
 String body = "<div class=\"container\">\n"
                 "<div class=\"centered-element\">\n"
-                  "<form action=\"/toggleLED\" method=\"GET\"><input type=\"submit\" value=\"Turn LED %toggleStub%\" class=\"simpleButton\"></form>\n"
+                  "<form action=\"/toggleLED\" method=\"GET\"><input type=\"submit\" value=\"Turn LED %toggleStub%\" class=\"simpleButton\" style=\"width: 100%;\"></form>\n"
                 "</div>\n"
               "</div>\n";
+#endif
+
+#ifdef TABBEDPAGE
+String body = "<div class=\"tabs\">\n"
+                "<div class=\"tab\">\n"
+                  "<input type=\"radio\" id=\"tab-0\" name=\"tab-group-1\" checked>\n"
+                  "<label for=\"tab-0\">Tab 0</label>\n"
+                  "<div class=\"content\">\n"
+
+                  "</div>\n"
+                "</div>\n"
+
+                "<div class=\"tab\">\n"
+                  "<input type=\"radio\" id=\"tab-1\" name=\"tab-group-1\">\n"
+                  "<label for=\"tab-1\">Tab 1</label>\n"
+                  "<div class=\"content\">\n"
+
+                  "</div>\n"
+                "</div>\n"
+
+                "<div class=\"tab\">\n"
+                  "<input type=\"radio\" id=\"tab-2\" name=\"tab-group-1\">\n"
+                  "<label for=\"tab-2\">Tab 2</label>\n"
+                  "<div class=\"content\">\n"
+
+                  "</div>\n"
+                "</div>\n"
+
+                "<div class=\"tab\">\n"
+                  "<input type=\"radio\" id=\"tab-3\" name=\"tab-group-1\">\n"
+                  "<label for=\"tab-3\">Tab 3</label>\n"
+                  "<div class=\"content\">\n"
+
+                  "</div>\n"
+                "</div>\n"
+
+              "</div>\n";
+#endif
 
 void handleRoot() {
   String deliveredHTML = assembleHTML(body);
