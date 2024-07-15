@@ -1,6 +1,6 @@
 //
 //
-//  ESP HTTP Server - Version 1.0.7
+//  ESP HTTP Server - Version 1.1.0
 //    This version was deployed 2024.02.02
 //
 //  ESP8266/32 Based
@@ -35,7 +35,7 @@
 // Define BASICPAGE or TABBEDPAGE - NOTE: For example only, please remove as it's only used to wrap the body in this file
 #define TABBEDPAGE
 
-// Webpage Hex Colors
+// Webpage User Settings
 #define PAGETITLE "ESP HTTP Server"
 #define BGCOLOR "000"
 #define TABBGCOLOR "111"
@@ -46,13 +46,14 @@
 #define REFRESHPAGE false
 #define PORT 80
 
+// espHTTPServer Object
+espHTTPServer httpServer( PAGETITLE, BGCOLOR, TABBGCOLOR, BUTTONCOLOR, TEXTCOLOR, FONT, TABHEIGHTEM, REFRESHPAGE, PORT );
+
+
 /*--------          GPIO          --------*/
 
 
 /*--------   Program Variables    --------*/
-
-// espHTTPServer Object
-espHTTPServer httpServer( PAGETITLE, BGCOLOR, TABBGCOLOR, BUTTONCOLOR, TEXTCOLOR, FONT, TABHEIGHTEM, REFRESHPAGE, PORT );
 
 
 /*--------     Main Functions     --------*/
@@ -101,6 +102,15 @@ void sendText() {
   httpServer.redirect();
 }
 
+// Status page, useful for returning values
+// Returns status of sensor values
+void status() {
+  String statusOf = server.arg("of");
+  if ( statusOf == "led" ) { server.send(200, "text/html", (String)(digitalRead(LED_BUILTIN))); }
+  else if ( statusOf == "message" ) { server.send(200, "text/html", message); }
+  else { handleNotFound(); }
+}
+
 
 /*--------       HTTP Server      --------*/
 
@@ -111,6 +121,7 @@ void serverSetup() {
   httpServer.server.on("/", handleRoot);
   httpServer.server.on("/toggleLED", HTTP_GET, toggleLED);
   httpServer.server.on("/sendText", HTTP_GET, sendText);
+  httpServer.server.on("/status", HTTP_GET, status);
   httpServer.server.onNotFound(handleNotFound);
   httpServer.server.begin();
 }

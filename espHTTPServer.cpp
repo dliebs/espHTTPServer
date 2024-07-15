@@ -1,6 +1,6 @@
 //
 //
-//  ESP HTTP Server - Version 1.0.7
+//  ESP HTTP Server - Version 1.1.0
 //    This version was deployed 2024.02.02
 //
 //  ESP8266/32 Based
