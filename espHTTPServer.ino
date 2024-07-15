@@ -1,5 +1,5 @@
 //
-// espHTTP v1.0.1
+// espHTTP v1.0.2
 // 2023.12.20
 //
 
@@ -24,10 +24,13 @@
 // Define BASICPAGE or TABBEDPAGE
 #define BASICPAGE
 
-// Colors
-#define BGCOLOR 000
-#define ACCENTCOLOR 000
-#define TXTCOLOR
+// Webpage Hex Colors
+#define BGCOLOR "000"
+#define TABBGCOLOR "111"
+#define BUTTONCOLOR "222"
+#define TEXTCOLOR "a40"
+#define FONT "Helvetica"
+#define TABHEIGHTEM "47"
 
 
 /*--------          GPIO          --------*/
@@ -62,6 +65,7 @@ void loop() {
   yield();
 }
 
+
 /*--------    Server Functions    --------*/
 
 void toggleLED() {
@@ -81,7 +85,7 @@ void serverSetup() {
 
 String body = "<div class=\"container\">\n"
                 "<div class=\"centered-element\">\n"
-                  "<form action=\"/toggleLED\" method=\"GET\"><input type=\"submit\" value=\"Turn LED %toggleStub%\" class=\"customButton\"></form>\n"
+                  "<form action=\"/toggleLED\" method=\"GET\"><input type=\"submit\" value=\"Turn LED %toggleStub%\" class=\"simpleButton\"></form>\n"
                 "</div>\n"
               "</div>\n";
 
