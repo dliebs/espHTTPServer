@@ -1,8 +1,24 @@
 //
-// espHTTP v1.0.3
-// 2024.01.10
+//
+//  ESP HTTP Server - Version 1.0.4
+//    This version was not deployed [2024.01.10]
+//
+//  ESP8266/32 Based
+//    HTTP Web Server
+//    Basic and tabbed sites
+//    Customizable colors and styles
+//
+//  Changes From Previous Version
+//    Comments, cleanup
+//
+//  To Do
+//    Convert to true library (see espIRRemote)
+//    Put body in flash
+//    Remove TABBEDPAGE and merge css
+//
 //
 
+// Returns full webpage HTML with header and footer
 String assembleHTML(String &body) {
   String webpage;
   addHead(webpage);
@@ -11,7 +27,7 @@ String assembleHTML(String &body) {
   return webpage;
 }
 
-
+// Add header to webpage
 void addHead(String &webpage) {
   webpage =  F( "<!DOCTYPE html>\n"
                 "<html>\n"
@@ -19,7 +35,9 @@ void addHead(String &webpage) {
                   "<title>" WiFiHostname "</title>\n"
                   "<meta name=\"mobile-web-app-capable\" content=\"yes\" />\n"
                   "<meta name=\"viewport\" content=\"width=device-width\" />\n"
-      //          "<meta http-equiv=\"refresh\" content=\"10\" />\n"
+#ifdef REFRESHPAGE
+                  "<meta http-equiv=\"refresh\" content=\"10\" />\n"
+#endif
                   "<style>\n"
                     "body {background-color: #" BGCOLOR "; color: #" TEXTCOLOR "; font-family: " FONT "; }\n"
                     "p { font-size: 1.25em; }\n"
@@ -47,11 +65,13 @@ void addHead(String &webpage) {
                 "<body>\n");
 }
 
+// Add footer to webpage
 void addFooter(String &webpage) {
   webpage += F(  "</body>\n"
                  "</html>\n");
 }
 
+// Send a 404 page with info
 void handleNotFound() {
   String message = "File Not Found\n\n";
   message += "URI: ";

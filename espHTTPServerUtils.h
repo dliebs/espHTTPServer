@@ -1,6 +1,21 @@
 //
-// espHTTP v1.0.3
-// 2024.01.10
+//
+//  ESP HTTP Server - Version 1.0.4
+//    This version was not deployed [2024.01.10]
+//
+//  ESP8266/32 Based
+//    HTTP Web Server
+//    Basic and tabbed sites
+//    Customizable colors and styles
+//
+//  Changes From Previous Version
+//    Comments, cleanup
+//
+//  To Do
+//    Convert to true library (see espIRRemote)
+//    Put body in flash
+//    Remove TABBEDPAGE and merge css
+//
 //
 
 /*----------  Libraries  ----------*/
