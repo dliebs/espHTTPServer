@@ -1,6 +1,6 @@
 //
 //
-//  ESP HTTP Server - Version 1.0.4
+//  ESP HTTP Server - Version 1.0.6
 //    This version was not deployed [2024.01.10]
 //
 //  ESP8266/32 Based
@@ -13,8 +13,6 @@
 //
 //  To Do
 //    Convert to true library (see espIRRemote)
-//    Put body in flash
-//    Remove TABBEDPAGE and merge css
 //
 //
 
@@ -36,7 +34,7 @@
 
 /*-------- User-Defined Variables --------*/
 
-// Define BASICPAGE or TABBEDPAGE
+// Define BASICPAGE or TABBEDPAGE - NOTE: For example only, please remove as it's only used to wrap the body in this file
 #define BASICPAGE
 
 // Define REFRESHPAGE or not
@@ -143,12 +141,11 @@ String body = "<div class=\"tabs\">\n"
                   "</div>\n"
                 "</div>\n"
 
-              "</div>\n";
+              "</div>\n");
 #endif
 
 void handleRoot() {
   String deliveredHTML = assembleHTML(body);
-
   if (digitalRead(LED_BUILTIN)) { deliveredHTML.replace("%toggleStub%", "On"); }
                            else { deliveredHTML.replace("%toggleStub%", "Off"); }
 

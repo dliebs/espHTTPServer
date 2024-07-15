@@ -1,6 +1,6 @@
 //
 //
-//  ESP HTTP Server - Version 1.0.4
+//  ESP HTTP Server - Version 1.0.6
 //    This version was not deployed [2024.01.10]
 //
 //  ESP8266/32 Based
@@ -13,8 +13,6 @@
 //
 //  To Do
 //    Convert to true library (see espIRRemote)
-//    Put body in flash
-//    Remove TABBEDPAGE and merge css
 //
 //
 

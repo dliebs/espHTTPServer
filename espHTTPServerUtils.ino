@@ -1,6 +1,6 @@
 //
 //
-//  ESP HTTP Server - Version 1.0.4
+//  ESP HTTP Server - Version 1.0.6
 //    This version was not deployed [2024.01.10]
 //
 //  ESP8266/32 Based
@@ -13,8 +13,6 @@
 //
 //  To Do
 //    Convert to true library (see espIRRemote)
-//    Put body in flash
-//    Remove TABBEDPAGE and merge css
 //
 //
 
@@ -47,7 +45,6 @@ void addHead(String &webpage) {
                     "input[type=range] { outline: 0; -webkit-appearance: none; width: 100%; height: 2.5em; margin: 0; background: linear-gradient(to right, #f00 0%, #ff8000 8.3%, #ff0 16.6%, #80ff00 25%, #0f0 33.3%, #00ff80 41.6%, #0ff 50%, #007fff 58.3%, #00f 66.6%, #7f00ff 75%, #f0f 83.3%, #ff0080 91.6%, #f00 100%); }\n"
                     ".container { display: flex; align-items: center; justify-content: center; height: 100%; border: 0px; }\n"
                     ".centered-element { margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 95%; }\n"
-#ifdef TABBEDPAGE
                     ".tabs { position: relative; min-height: 200px; clear: both; margin: 25px 0; }\n"
                     ".tab { float: left; }\n"
                     ".tab label { background-color: #" BUTTONCOLOR "; padding: 10px; border: 3px solid #" BGCOLOR "; margin-left: -1px; position: relative; left: 1px; font-size: 1.25em; }\n"
@@ -59,7 +56,6 @@ void addHead(String &webpage) {
                     "div.table span { display: table-cell; text-align: center; }\n"
                     "input[type=checkbox] { transform: scale(2); margin: 1em; }\n"
                     "input[type=time] { font-family: Helvetica; }\n"
-#endif
                   "</style>\n"
                 "</head>\n"
                 "<body>\n");
