@@ -1,7 +1,7 @@
 //
 //
-//  ESP HTTP Server - Version 1.1.0
-//    This version was deployed 2024.02.02
+//  ESP HTTP Server - Version 1.1.0b
+//    This version was deployed 2024.08.19
 //
 //  ESP8266/32 Based
 //    HTTP Web Server
@@ -9,8 +9,7 @@
 //    Customizable colors and styles
 //
 //  Changes From Previous Version
-//    Comments, cleanup
-//    Library-ified!
+//    Fixed a few missing httpServer. in status()
 //
 //
 
@@ -67,7 +66,7 @@ void setup() {
   digitalWrite(LED_BUILTIN, true);
 
   // Connect to WiFi, start OTA
-  connectWiFi(STASSID, STAPSK, WiFiHostname);
+  connectWiFi(STASSID, STAPSK, WiFiHostname, LED_BUILTIN);
   initializeOTA(WiFiHostname, STAPSK);
 
   // Start HTML Server, add functions and customize below
@@ -105,9 +104,9 @@ void sendText() {
 // Status page, useful for returning values
 // Returns status of sensor values
 void status() {
-  String statusOf = server.arg("of");
-  if ( statusOf == "led" ) { server.send(200, "text/html", (String)(digitalRead(LED_BUILTIN))); }
-  else if ( statusOf == "message" ) { server.send(200, "text/html", message); }
+  String statusOf = httpServer.server.arg("of");
+  if ( statusOf == "led" ) { httpServer.server.send(200, "text/html", (String)(digitalRead(LED_BUILTIN))); }
+  else if ( statusOf == "message" ) { httpServer.server.send(200, "text/html", message); }
   else { handleNotFound(); }
 }
 
@@ -187,7 +186,7 @@ String body = "<div class=\"tabs\">\n"
                   "<div class=\"content\">\n"
 
                     // Color picker examples
-                    // Hue slider, set value 0-359 with %colorHex%
+                    // Hue slider, set value 0-359 (can be set to max of 255 for FastLED) with %colorHex%
                     "<form action=\"/sendText\" method=\"GET\">"
                       "<input class=\"simpleButton\" type=\"range\" onchange=\"this.form.submit()\" min=\"0\" max=\"359\" step=\"1\" name=\"message\" value=\"180\" style=\"width: 100%;\">"
                     "</form>\n"
