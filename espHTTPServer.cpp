@@ -1,7 +1,6 @@
 //
 //
-//  ESP HTTP Server - Version 1.1.0
-//    This version was deployed 2024.02.02
+//  ESP HTTP Server
 //
 //  ESP8266/32 Based
 //    HTTP Web Server
@@ -9,8 +8,7 @@
 //    Customizable colors and styles
 //
 //  Changes From Previous Version
-//    Comments, cleanup
-//    Library-ified!
+//    Added custom redirect
 //
 //
 
@@ -72,6 +70,7 @@ void espHTTPServer::addHead(String &webpage) {
                   "[type=radio]:checked ~ label ~ .content { z-index: 1; }\n"
                   "div.table { display: table; width: 100%; table-layout: fixed; }\n"
                   "div.table span { display: table-cell; text-align: center; }\n"
+                  "form { display: inline; }\n"
                 "</style>\n"
               "</head>\n"
               "<body>\n";
@@ -102,5 +101,11 @@ void espHTTPServer::handleNotFound() {
 // Sends the client back to the root page
 void espHTTPServer::redirect() {
   server.sendHeader("Location", "/");
-  server.send(303);
+  server.send(307);
+}
+
+// Sends the client to path
+void espHTTPServer::redirect(String path) {
+  server.sendHeader("Location", path);
+  server.send(307);
 }

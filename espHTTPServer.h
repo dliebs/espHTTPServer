@@ -1,7 +1,6 @@
 //
 //
-//  ESP HTTP Server - Version 1.1.0
-//    This version was deployed 2024.02.02
+//  ESP HTTP Server
 //
 //  ESP8266/32 Based
 //    HTTP Web Server
@@ -9,8 +8,7 @@
 //    Customizable colors and styles
 //
 //  Changes From Previous Version
-//    Comments, cleanup
-//    Library-ified!
+//    Added custom redirect
 //
 //
 
@@ -42,6 +40,8 @@ class espHTTPServer {
     void handleNotFound();
     // Sends the client back to the root page
     void redirect();
+    // Sends the client back to the path page
+    void redirect(String);
 
     // Server Object, public because we'll need to call it in our project file for serverSetup, handleRoot, and main loop
     #ifdef ESP8266
