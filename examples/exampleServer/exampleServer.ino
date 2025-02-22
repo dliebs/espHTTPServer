@@ -14,7 +14,9 @@
 #include <espHTTPUtils.h>
 #include <espWiFiUtils.h>
 
+
 /*-------- User-Defined Variables --------*/
+
 
 
 /*--------          GPIO          --------*/
@@ -23,14 +25,18 @@
 #define LED_BUILTIN 2
 #endif
 
+
 /*--------   Program Variables    --------*/
 
+// espHTTPServer
 // Pointer for HTTP Server
 espHTTPServer * httpServer;
 
+// espHTTPUtils
 // Placeholders for Slack Webhook API URL and message - they can be either populated with default values or left blank
 String slack_url /*= "https://hooks.slack.com/services/TXXXXXXXXXX/BXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"*/;
 String message /*= "IO33 Pressed"*/;
+
 
 /*--------     Main Functions     --------*/
 
@@ -52,6 +58,7 @@ void setup() {
 
   // Load Settings
   loadServerConfig();
+  loadUtilConfig();
 
   // Start HTML Server, add functions and customize below
   serverSetup();
@@ -73,6 +80,9 @@ void loop() {
   yield();
 }
 
+
+/*--------     Config Functions     --------*/
+
 // Load HTTP Server Settings
 void loadServerConfig() {
   // Mount SPIFFS
@@ -91,24 +101,17 @@ void loadServerConfig() {
         JsonObject& json = jsonBuffer.parseObject(buf.get());
         if (json.success()) {
           // Successfully parsed JSON, setup HTTP server
-          httpServer = new espHTTPServer( json["PAGETITLE"], json["BGCOLOR"], json["TABBGCOLOR"], json["BUTTONCOLOR"], json["TEXTCOLOR"], json["FONT"], json["TABHEIGHTEM"], (bool)json["REFRESHPAGE"], (int)json["PORT"] );
-
-          char buffer[150];
-          strcpy(buffer, json["SLACK_URL"]);
-          slack_url = buffer;
-
-          if ( json.containsKey("MESSAGE") ) {
-          strcpy(buffer, json["MESSAGE"]);
-          message = buffer;
+          httpServer = new espHTTPServer( json["PAGETITLE"], json["BGCOLOR"], json["TABBGCOLOR"],
+                                          json["BUTTONCOLOR"], json["TEXTCOLOR"], json["FONT"],
+                                          json["TABHEIGHTEM"], (bool)json["REFRESHPAGE"], (int)json["PORT"] );
           }
-        }
         configFile.close();
       }
     }
     else {
       // If no config file, create one using defaults
       httpServer = new espHTTPServer( "ESP HTTP Server", "000", "111", "222", "a40", "Helvetica", "47", false, 80 );
-      saveHTTPSettings();
+      saveServerSettings();
     }
   }
   else {
@@ -117,7 +120,47 @@ void loadServerConfig() {
   }
 }
 
-void saveHTTPSettings() {
+// Load HTTP Utility Settings
+void loadUtilConfig() {
+  // Mount SPIFFS
+  if (SPIFFS.begin()) {
+    // File system mounted
+    if (SPIFFS.exists("/httpUtilConfig.json")) {
+      // File exists, reading and loading
+      File configFile = SPIFFS.open("/httpUtilConfig.json", "r");
+      if (configFile) {
+        // Allocate a buffer to store contents of the file.
+        size_t size = configFile.size();
+        std::unique_ptr<char[]> buf(new char[size]);
+
+        configFile.readBytes(buf.get(), size);
+        DynamicJsonBuffer jsonBuffer;
+        JsonObject& json = jsonBuffer.parseObject(buf.get());
+        if (json.success()) {
+          // Successfully parsed JSON, copy data
+          char buffer[255];
+          strcpy(buffer, json["SLACK_URL"]);
+          slack_url = buffer;
+
+          strcpy(buffer, json["MESSAGE"]);
+          message = buffer;
+        }
+        configFile.close();
+      }
+    }
+    else {
+      // If no config file, create one using blank defaults
+      saveUtilSettings();
+    }
+  }
+  else {
+    // If no SPIFFS, use defaults placeholders
+    slack_url = "https://hooks.slack.com/services/TXXXXXXXXXX/BXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX";
+    message = "Hello ESP";
+  }
+}
+
+void saveServerSettings() {
     // Save settings to the file system
     DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
@@ -131,10 +174,22 @@ void saveHTTPSettings() {
     json["TABHEIGHTEM"] = httpServer -> returnSetting(6);
     json["REFRESHPAGE"] = httpServer -> returnSetting(7);
     json["PORT"] = httpServer -> returnSetting(8);
+
+    File configFile = SPIFFS.open("/httpServerConfig.json", "w");
+
+    json.printTo(configFile);
+    configFile.close();
+}
+
+void saveUtilSettings() {
+    // Save settings to the file system
+    DynamicJsonBuffer jsonBuffer;
+    JsonObject& json = jsonBuffer.createObject();
+
     json["SLACK_URL"] = slack_url;
     json["MESSAGE"] = message;
 
-    File configFile = SPIFFS.open("/httpServerConfig.json", "w");
+    File configFile = SPIFFS.open("/httpUtilConfig.json", "w");
 
     json.printTo(configFile);
     configFile.close();
@@ -153,6 +208,7 @@ void toggleLED() {
 void sendText() {
   message = httpServer -> server.arg("message");
   sendSlackMessage(message, slack_url);
+  saveUtilSettings();
   redirect();
 }
 
@@ -167,41 +223,34 @@ void status() {
 
 // Save a new hostname and restart the device
 void setHostname() {
-  char buffer[32];
-  strcpy(buffer, httpServer -> server.arg("hostname").c_str());
-  saveHostname(buffer);
-}
-
-// Save a new Slack URL
-void setSlackURL() {
-  char buffer[82];
-  strcpy(buffer, httpServer -> server.arg("SLACK_URL").c_str());
-  slack_url = buffer;
-  saveHTTPSettings();
-  redirect();
+  if ( httpServer -> server.arg("hostname").length() < 33 ) {
+    char buffer[32];
+    strcpy(buffer, httpServer -> server.arg("hostname").c_str());
+    saveHostname(buffer);
+  }
 }
 
 // Save a new message
-void setMessage() {
-  char buffer[150];
-  strcpy(buffer, httpServer -> server.arg("MESSAGE").c_str());
-  message = buffer;
-  saveHTTPSettings();
+void setUtilSettings() {
+  slack_url = httpServer -> server.arg("SLACK_URL");
+  message = httpServer -> server.arg("MESSAGE");
+
+  saveUtilSettings();
   redirect();
 }
 
 // Save a new Slack URL
-void setHTTPSettings() {
-  char buffer[150];
-  strcpy(buffer, httpServer -> server.arg("SLACK_URL").c_str());
-  slack_url = buffer;
-
-  strcpy(buffer, httpServer -> server.arg("MESSAGE").c_str());
-  message = buffer;
-
-  httpServer -> newSettings( httpServer -> server.arg("PAGETITLE"), httpServer -> server.arg("BGCOLOR"), httpServer -> server.arg("TABBGCOLOR"), httpServer -> server.arg("BUTTONCOLOR"), httpServer -> server.arg("TEXTCOLOR"), httpServer -> server.arg("FONT"), httpServer -> server.arg("TABHEIGHTEM"), httpServer -> server.arg("REFRESHPAGE").equals("1"), httpServer -> server.arg("PORT").toInt() );
-
-  saveHTTPSettings();
+void setServerSettings() {
+  httpServer -> newSettings( httpServer -> server.arg("PAGETITLE"),
+                             httpServer -> server.arg("BGCOLOR"),
+                             httpServer -> server.arg("TABBGCOLOR"),
+                             httpServer -> server.arg("BUTTONCOLOR"),
+                             httpServer -> server.arg("TEXTCOLOR"),
+                             httpServer -> server.arg("FONT"),
+                             httpServer -> server.arg("TABHEIGHTEM"),
+                             httpServer -> server.arg("REFRESHPAGE").equals("1"),
+                             httpServer -> server.arg("PORT").toInt() );
+  saveServerSettings();
   redirect();
 }
 
@@ -215,11 +264,10 @@ void serverSetup() {
   httpServer -> server.on("/embed", handleEmbed);
   httpServer -> server.on("/settings", handleSettings);
   httpServer -> server.on("/setHostname", HTTP_GET, setHostname);
-  httpServer -> server.on("/setSlackURL", HTTP_GET, setSlackURL);
-  httpServer -> server.on("/setMessage", HTTP_GET, setMessage);
-  httpServer -> server.on("/setHTTPSettings", HTTP_GET, setHTTPSettings);
-  httpServer -> server.on("/status", HTTP_GET, status);
+  httpServer -> server.on("/setUtilSettings", HTTP_GET, setUtilSettings);
+  httpServer -> server.on("/setServerSettings", HTTP_GET, setServerSettings);
 
+  httpServer -> server.on("/status", HTTP_GET, status);
   httpServer -> server.on("/toggleLED", HTTP_GET, toggleLED);
   httpServer -> server.on("/sendText", HTTP_GET, sendText);
   httpServer -> server.onNotFound(handleNotFound);
@@ -286,16 +334,12 @@ String body = "<div class=\"tabs\">\n"
                       "<input type=\"submit\" class=\"textInput\" style=\"width: 25%;\" value=\"Set\">\n"
                     "</form><br><br>\n"
 
-                    "<p class=\"simpleHeader\">Set Slack URL:</p>\n"
-                    "<form action=\"/setSlackURL\" style=\"display: flex;\" method=\"GET\">\n"
-                      "<input type=\"text\" class=\"textInput\" name=\"SLACK_URL\" value=\"%SLACK_URLStub%\" style=\"width: 75%;\">\n"
-                      "<input type=\"submit\" class=\"textInput\" style=\"width: 25%;\" value=\"Set\">\n"
-                    "</form><br><br>\n"
-
-                    "<p class=\"simpleHeader\">Set Message:</p>\n"
-                    "<form action=\"/setMessage\" style=\"display: flex;\" method=\"GET\">\n"
-                      "<input type=\"text\" class=\"textInput\" name=\"MESSAGE\" value=\"%MESSAGEStub%\" style=\"width: 75%;\">\n"
-                      "<input type=\"submit\" class=\"textInput\" style=\"width: 25%;\" value=\"Set\">\n"
+                    "<form action=\"/setUtilSettings\" style=\"display: flex; flex-wrap: wrap;\" method=\"GET\">\n"
+                      "<p class=\"simpleHeader\">Slack URL:</p>\n"
+                      "<input type=\"text\" class=\"textInput\" name=\"SLACK_URL\" value=\"%SLACK_URLStub%\" style=\"width: 100%;\">\n"
+                      "<p class=\"simpleHeader\" style=\"padding-top: 1em;\">Message:</p>\n"
+                      "<input type=\"text\" class=\"textInput\" name=\"MESSAGE\" value=\"%MESSAGEStub%\" style=\"width: 100%;\">\n"
+                      "<input type=\"submit\" class=\"textInput\" style=\"width: 100%;\" value=\"Set\">\n"
                     "</form>\n"
 
                   "</div>\n"
@@ -306,7 +350,7 @@ String body = "<div class=\"tabs\">\n"
                   "<label for=\"tab-3\">HTTP Settings</label>\n"
                   "<div class=\"content\">\n"
 
-                    "<form action=\"/setHTTPSettings\" style=\"\" method=\"GET\">\n"
+                    "<form action=\"/setServerSettings\" style=\"\" method=\"GET\">\n"
                       "<div class=\"table\">"
                         "<span class=\"settingTitle\">Title:</span>"
                         "<span><input type=\"text\" class=\"textInput settingText\" name=\"PAGETITLE\" value=\"%PAGETITLEStub%\"></span>"
@@ -342,14 +386,6 @@ String body = "<div class=\"tabs\">\n"
                       "<div class=\"table\">"
                         "<span class=\"settingTitle\">Port:</span>"
                         "<span><input type=\"text\" class=\"textInput settingText\" name=\"PORT\" value=\"%PORTStub%\"></span>"
-                      "</div>"
-                      "<div class=\"table\">"
-                        "<span class=\"settingTitle\">Slack URL:</span>"
-                        "<span><input type=\"text\" class=\"textInput settingText\" name=\"SLACK_URL\" value=\"%SLACK_URLStub%\"></span>"
-                      "</div>"
-                      "<div class=\"table\">"
-                        "<span class=\"settingTitle\">Message:</span>"
-                        "<span><input type=\"text\" class=\"textInput settingText\" name=\"MESSAGE\" value=\"%MESSAGEStub%\"></span>"
                       "</div>"
                       "<input type=\"submit\" class=\"textInput\" style=\"width: 100%;\" value=\"Set\">\n"
                     "</form>\n"
@@ -387,6 +423,7 @@ void handleRoot() {
   deliveredHTML.replace("%TABHEIGHTEMStub%", httpServer -> returnSetting(6));
   deliveredHTML.replace("%REFRESHPAGEStub%", httpServer -> returnSetting(7));
   deliveredHTML.replace("%PORTStub%", httpServer -> returnSetting(8));
+
   deliveredHTML.replace("%SLACK_URLStub%", slack_url);
   deliveredHTML.replace("%MESSAGEStub%", message);
 
@@ -430,21 +467,17 @@ void handleSettings() {
                     "<p class=\"simpleHeader\">Set Hostname, Restart:</p>\n"
                     "<form action=\"/setHostname\" style=\"display: flex;\" method=\"GET\">\n"
                       "<input type=\"text\" class=\"textInput\" name=\"hostname\" value=\"%hostnameStub%\" style=\"width: 75%;\">\n"
+                      "<input type=\"hidden\" name=\"path\" value=\"settings\">"
                       "<input type=\"submit\" class=\"textInput\" style=\"width: 25%;\" value=\"Set\">\n"
                     "</form><br><br>\n"
 
-                    "<p class=\"simpleHeader\">Set Slack URL:</p>\n"
-                    "<form action=\"/setSlackURL\" style=\"display: flex;\" method=\"GET\">\n"
+                    "<form action=\"/setUtilSettings\" style=\"display: flex; flex-wrap: wrap;\" method=\"GET\">\n"
+                      "<p class=\"simpleHeader\">Slack URL:</p>\n"
+                      "<input type=\"text\" class=\"textInput\" name=\"SLACK_URL\" value=\"%SLACK_URLStub%\" style=\"width: 100%;\">\n"
+                      "<p class=\"simpleHeader\" style=\"padding-top: 1em;\">Message:</p>\n"
+                      "<input type=\"text\" class=\"textInput\" name=\"MESSAGE\" value=\"%MESSAGEStub%\" style=\"width: 100%;\">\n"
                       "<input type=\"hidden\" name=\"path\" value=\"settings\">"
-                      "<input type=\"text\" class=\"textInput\" name=\"SLACK_URL\" value=\"%SLACK_URLStub%\" style=\"width: 75%;\">\n"
-                      "<input type=\"submit\" class=\"textInput\" style=\"width: 25%;\" value=\"Set\">\n"
-                    "</form><br><br>\n"
-
-                    "<p class=\"simpleHeader\">Set Message:</p>\n"
-                    "<form action=\"/setMessage\" style=\"display: flex;\" method=\"GET\">\n"
-                      "<input type=\"hidden\" name=\"path\" value=\"settings\">"
-                      "<input type=\"text\" class=\"textInput\" name=\"MESSAGE\" value=\"%MESSAGEStub%\" style=\"width: 75%;\">\n"
-                      "<input type=\"submit\" class=\"textInput\" style=\"width: 25%;\" value=\"Set\">\n"
+                      "<input type=\"submit\" class=\"textInput\" style=\"width: 100%;\" value=\"Set\">\n"
                     "</form>\n"
 
                   "</div>\n"
@@ -455,7 +488,7 @@ void handleSettings() {
                   "<label for=\"tab-1\">HTTP Settings</label>\n"
                   "<div class=\"content\">\n"
 
-                    "<form action=\"/setHTTPSettings\" style=\"\" method=\"GET\">\n"
+                    "<form action=\"/setServerSettings\" style=\"\" method=\"GET\">\n"
                       "<div class=\"table\">"
                         "<span class=\"settingTitle\">Title:</span>"
                         "<span><input type=\"text\" class=\"textInput settingText\" name=\"PAGETITLE\" value=\"%PAGETITLEStub%\"></span>"
@@ -492,14 +525,6 @@ void handleSettings() {
                         "<span class=\"settingTitle\">Port:</span>"
                         "<span><input type=\"text\" class=\"textInput settingText\" name=\"PORT\" value=\"%PORTStub%\"></span>"
                       "</div>"
-                      "<div class=\"table\">"
-                        "<span class=\"settingTitle\">Slack URL:</span>"
-                        "<span><input type=\"text\" class=\"textInput settingText\" name=\"SLACK_URL\" value=\"%SLACK_URLStub%\"></span>"
-                      "</div>"
-                      "<div class=\"table\">"
-                        "<span class=\"settingTitle\">Message:</span>"
-                        "<span><input type=\"text\" class=\"textInput settingText\" name=\"MESSAGE\" value=\"%MESSAGEStub%\"></span>"
-                      "</div>"
                       "<input type=\"hidden\" name=\"path\" value=\"settings\">"
                       "<input type=\"submit\" class=\"textInput\" style=\"width: 100%;\" value=\"Set\">\n"
                     "</form>\n"
@@ -522,6 +547,7 @@ void handleSettings() {
   deliveredHTML.replace("%TABHEIGHTEMStub%", httpServer -> returnSetting(6));
   deliveredHTML.replace("%REFRESHPAGEStub%", httpServer -> returnSetting(7));
   deliveredHTML.replace("%PORTStub%", httpServer -> returnSetting(8));
+
   deliveredHTML.replace("%SLACK_URLStub%", slack_url);
   deliveredHTML.replace("%MESSAGEStub%", message);
 
