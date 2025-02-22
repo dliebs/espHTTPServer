@@ -4,11 +4,10 @@
 //
 //  ESP8266/32 Based
 //    HTTP Web Server
-//    Basic and tabbed sites
 //    Customizable colors and styles
 //
 //  Changes From Previous Version
-//    Added custom redirect
+//    Added returnSetting and newSettings
 //
 //
 
@@ -29,6 +28,62 @@ espHTTPServer::espHTTPServer(String PAGETITLE, String BGCOLOR, String TABBGCOLOR
   _FONT = FONT;
   _TABHEIGHTEM = TABHEIGHTEM;
   _REFRESHPAGE = REFRESHPAGE;
+  _PORT = PORT;
+}
+
+// Return settings PAGETITLE, BGCOLOR, TABBGCOLOR, BUTTONCOLOR, TEXTCOLOR, FONT, TABHEIGHTEM, REFRESHPAGE, PORT
+String espHTTPServer::returnSetting(int setting) {
+  switch (setting) {
+    case 0:
+      return _PAGETITLE;
+      break;
+
+    case 1:
+      return _BGCOLOR;
+      break;
+
+    case 2:
+      return _TABBGCOLOR;
+      break;
+
+    case 3:
+      return _BUTTONCOLOR;
+      break;
+
+    case 4:
+      return _TEXTCOLOR;
+      break;
+
+    case 5:
+      return _FONT;
+      break;
+
+    case 6:
+      return _TABHEIGHTEM;
+      break;
+
+    case 7:
+      return (String)_REFRESHPAGE;
+      break;
+
+    case 8:
+      return (String)_PORT;
+      break;
+  }
+}
+
+// Sets new settings PAGETITLE, BGCOLOR, TABBGCOLOR, BUTTONCOLOR, TEXTCOLOR, FONT, TABHEIGHTEM, REFRESHPAGE, PORT
+// Port applies on next restart
+void espHTTPServer::newSettings(String PAGETITLE, String BGCOLOR, String TABBGCOLOR, String BUTTONCOLOR, String TEXTCOLOR, String FONT, String TABHEIGHTEM, bool REFRESHPAGE, int PORT) {
+  _PAGETITLE = PAGETITLE;
+  _BGCOLOR = BGCOLOR;
+  _TABBGCOLOR = TABBGCOLOR;
+  _BUTTONCOLOR = BUTTONCOLOR;
+  _TEXTCOLOR = TEXTCOLOR;
+  _FONT = FONT;
+  _TABHEIGHTEM = TABHEIGHTEM;
+  _REFRESHPAGE = REFRESHPAGE;
+  _PORT = PORT;
 }
 
 // Returns full webpage HTML with header and footer
@@ -53,9 +108,11 @@ void espHTTPServer::addHead(String &webpage) {
      webpage += "<style>\n"
                   "body {background-color: #" + _BGCOLOR + "; color: #" + _TEXTCOLOR + "; font-family: " + _FONT + "; }\n"
                   "p { font-size: 1.25em; }\n"
+                  "p.simpleHeader { font-size: 2em; margin: 0; }\n"
                   "input.simpleButton { height: 2.5em; padding: 0; font-size: 2em; background-color: #" + _BUTTONCOLOR + "; border-color: #" + _BUTTONCOLOR + "; color: #" + _TEXTCOLOR + "; font-family: " + _FONT + "; }\n"
                   "button.inputButton { height: 2.5em; padding: 0; position: relative; font-size: 2em; background-color: #" + _BUTTONCOLOR + "; border-color: #" + _BUTTONCOLOR + "; color: #" + _TEXTCOLOR + "; font-family: " + _FONT + "; }\n"
                   "input.textInput { height: 2em; padding: 0 0.5em 0 0.5em; position: relative; text-align: center; font-size: 2em; background-color: #" + _BUTTONCOLOR + "; border-color: #" + _BUTTONCOLOR + "; border-width: 0; color: #" + _TEXTCOLOR + "; font-family: " + _FONT + "; }\n"
+                  "input.settingText { width: 100%; float: right; }\n"
                   "input[type=range].rgbSlider { outline: 0; -webkit-appearance: none; width: 100%; height: 2.5em; margin: 0; background: linear-gradient(to right, #f00 0%, #ff8000 8.3%, #ff0 16.6%, #80ff00 25%, #0f0 33.3%, #00ff80 41.6%, #0ff 50%, #007fff 58.3%, #00f 66.6%, #7f00ff 75%, #f0f 83.3%, #ff0080 91.6%, #f00 100%); }\n"
                   "input[type=range].white { outline: 0; -webkit-appearance: none; width: 100%; height: 2.5em; margin: 0; background: linear-gradient(to right, #ffff7f 0%, #fff 100%); }\n"
                   "input[type=range].coolWhite { outline: 0; -webkit-appearance: none; width: 100%; height: 2.5em; margin: 0; background: linear-gradient(to right, #000 0%, #fff 100%); }\n"
@@ -74,6 +131,7 @@ void espHTTPServer::addHead(String &webpage) {
                   "div.table { display: table; width: 100%; table-layout: fixed; }\n"
                   "div.table span { display: table-cell; text-align: center; }\n"
                   "form { display: inline; }\n"
+                  "span.settingTitle { font-size: 2em; width: 30%; text-align: left !important; vertical-align: middle; }\n"
                 "</style>\n"
               "</head>\n"
               "<body>\n";

@@ -4,11 +4,10 @@
 //
 //  ESP8266/32 Based
 //    HTTP Web Server
-//    Basic and tabbed sites
 //    Customizable colors and styles
 //
 //  Changes From Previous Version
-//    Added custom redirect
+//    Added returnSetting and newSettings
 //
 //
 
@@ -34,6 +33,10 @@ class espHTTPServer {
     // Create HTTP Server - PAGETITLE, BGCOLOR, TABBGCOLOR, BUTTONCOLOR, TEXTCOLOR, FONT, TABHEIGHTEM, REFRESHPAGE, PORT
     espHTTPServer(String, String, String, String, String, String, String, bool, int);
 
+    // Return settings
+    String returnSetting(int);
+    // Apply new settings
+    void newSettings(String, String, String, String, String, String, String, bool, int);
     // Returns full webpage HTML with header and footer
     String assembleHTML(String &);
     // Send a 404 page with info
@@ -57,6 +60,7 @@ class espHTTPServer {
 
     // Variables to store style settings
     String  _PAGETITLE, _BGCOLOR, _TABBGCOLOR, _BUTTONCOLOR, _TEXTCOLOR, _FONT, _TABHEIGHTEM;
+    int _PORT;
     bool _REFRESHPAGE;
 };
 
