@@ -112,7 +112,7 @@ void espHTTPServer::addHead(String &webpage) {
                   "input.simpleButton { height: 2.5em; padding: 0; font-size: 2em; background-color: #" + _BUTTONCOLOR + "; border-color: #" + _BUTTONCOLOR + "; color: #" + _TEXTCOLOR + "; font-family: " + _FONT + "; }\n"
                   "button.inputButton { height: 2.5em; padding: 0; position: relative; font-size: 2em; background-color: #" + _BUTTONCOLOR + "; border-color: #" + _BUTTONCOLOR + "; color: #" + _TEXTCOLOR + "; font-family: " + _FONT + "; }\n"
                   "input.textInput { height: 2em; padding: 0 0.5em 0 0.5em; position: relative; text-align: center; font-size: 2em; background-color: #" + _BUTTONCOLOR + "; border-color: #" + _BUTTONCOLOR + "; border-width: 0; color: #" + _TEXTCOLOR + "; font-family: " + _FONT + "; }\n"
-                  "input.settingText { width: 100%; float: right; }\n"
+                  "input.settingText { width: 100%; float: right; height: 1.75em; }\n"
                   "input[type=range].rgbSlider { outline: 0; -webkit-appearance: none; width: 100%; height: 2.5em; margin: 0; background: linear-gradient(to right, #f00 0%, #ff8000 8.3%, #ff0 16.6%, #80ff00 25%, #0f0 33.3%, #00ff80 41.6%, #0ff 50%, #007fff 58.3%, #00f 66.6%, #7f00ff 75%, #f0f 83.3%, #ff0080 91.6%, #f00 100%); }\n"
                   "input[type=range].white { outline: 0; -webkit-appearance: none; width: 100%; height: 2.5em; margin: 0; background: linear-gradient(to right, #ffff7f 0%, #fff 100%); }\n"
                   "input[type=range].coolWhite { outline: 0; -webkit-appearance: none; width: 100%; height: 2.5em; margin: 0; background: linear-gradient(to right, #000 0%, #fff 100%); }\n"
