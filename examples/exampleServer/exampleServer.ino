@@ -35,7 +35,7 @@ espHTTPServer * httpServer;
 // espHTTPUtils
 // Placeholders for Slack Webhook API URL and message - they can be either populated with default values or left blank
 String slack_url /*= "https://hooks.slack.com/services/TXXXXXXXXXX/BXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX"*/;
-String message /*= "IO33 Pressed"*/;
+String message /*= "Hello ESP"*/;
 
 
 /*--------     Main Functions     --------*/

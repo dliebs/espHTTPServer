@@ -70,6 +70,7 @@ String espHTTPServer::returnSetting(int setting) {
       return (String)_PORT;
       break;
   }
+  return "";
 }
 
 // Sets new settings PAGETITLE, BGCOLOR, TABBGCOLOR, BUTTONCOLOR, TEXTCOLOR, FONT, TABHEIGHTEM, REFRESHPAGE, PORT
