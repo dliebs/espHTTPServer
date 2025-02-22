@@ -111,7 +111,7 @@ void loadServerConfig() {
     else {
       // If no config file, create one using defaults
       httpServer = new espHTTPServer( "ESP HTTP Server", "000", "111", "222", "a40", "Helvetica", "47", false, 80 );
-      saveServerSettings();
+      saveServerConfig();
     }
   }
   else {
@@ -150,7 +150,7 @@ void loadUtilConfig() {
     }
     else {
       // If no config file, create one using blank defaults
-      saveUtilSettings();
+      saveUtilConfig();
     }
   }
   else {
@@ -160,7 +160,7 @@ void loadUtilConfig() {
   }
 }
 
-void saveServerSettings() {
+void saveServerConfig() {
     // Save settings to the file system
     DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
@@ -181,7 +181,7 @@ void saveServerSettings() {
     configFile.close();
 }
 
-void saveUtilSettings() {
+void saveUtilConfig() {
     // Save settings to the file system
     DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
@@ -208,7 +208,7 @@ void toggleLED() {
 void sendText() {
   message = httpServer -> server.arg("message");
   sendSlackMessage(message, slack_url);
-  saveUtilSettings();
+  saveUtilConfig();
   redirect();
 }
 
@@ -220,6 +220,8 @@ void status() {
   else if ( statusOf == "message" ) { httpServer -> server.send(200, "text/html", message); }
   else { handleNotFound(); }
 }
+
+
 
 // Save a new hostname and restart the device
 void setHostname() {
@@ -235,7 +237,7 @@ void setUtilSettings() {
   slack_url = httpServer -> server.arg("SLACK_URL");
   message = httpServer -> server.arg("MESSAGE");
 
-  saveUtilSettings();
+  saveUtilConfig();
   redirect();
 }
 
@@ -250,7 +252,7 @@ void setServerSettings() {
                              httpServer -> server.arg("TABHEIGHTEM"),
                              httpServer -> server.arg("REFRESHPAGE").equals("1"),
                              httpServer -> server.arg("PORT").toInt() );
-  saveServerSettings();
+  saveServerConfig();
   redirect();
 }
 
@@ -266,8 +268,8 @@ void serverSetup() {
   httpServer -> server.on("/setHostname", HTTP_GET, setHostname);
   httpServer -> server.on("/setUtilSettings", HTTP_GET, setUtilSettings);
   httpServer -> server.on("/setServerSettings", HTTP_GET, setServerSettings);
-
   httpServer -> server.on("/status", HTTP_GET, status);
+
   httpServer -> server.on("/toggleLED", HTTP_GET, toggleLED);
   httpServer -> server.on("/sendText", HTTP_GET, sendText);
   httpServer -> server.onNotFound(handleNotFound);
