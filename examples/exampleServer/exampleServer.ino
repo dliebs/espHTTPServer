@@ -72,7 +72,7 @@ void loop() {
   yield();
 }
 
-// Load Settings
+// Load HTTP Server Settings
 void loadServerConfig() {
   // Mount SPIFFS
   if (SPIFFS.begin()) {
@@ -102,7 +102,7 @@ void loadServerConfig() {
     else {
       // If no config file, create one using defaults
       httpServer = new espHTTPServer( "ESP HTTP Server", "000", "111", "222", "a40", "Helvetica", "47", false, 80 );
-      saveSettings();
+      saveHTTPSettings();
     }
   }
   else {
@@ -111,7 +111,7 @@ void loadServerConfig() {
   }
 }
 
-void saveSettings() {
+void saveHTTPSettings() {
     // Save settings to the file system
     DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
@@ -171,7 +171,7 @@ void setSlackURL() {
   char buffer[82];
   strcpy(buffer, httpServer -> server.arg("SLACK_URL").c_str());
   slack_url = buffer;
-  saveSettings();
+  saveHTTPSettings();
   redirect();
 }
 
@@ -183,7 +183,7 @@ void setHTTPSettings() {
 
   httpServer -> newSettings( httpServer -> server.arg("PAGETITLE"), httpServer -> server.arg("BGCOLOR"), httpServer -> server.arg("TABBGCOLOR"), httpServer -> server.arg("BUTTONCOLOR"), httpServer -> server.arg("TEXTCOLOR"), httpServer -> server.arg("FONT"), httpServer -> server.arg("TABHEIGHTEM"), httpServer -> server.arg("REFRESHPAGE").equals("1"), httpServer -> server.arg("PORT").toInt() );
 
-  saveSettings();
+  saveHTTPSettings();
   redirect();
 }
 
