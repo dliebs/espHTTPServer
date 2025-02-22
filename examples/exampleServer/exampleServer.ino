@@ -29,7 +29,7 @@
 espHTTPServer * httpServer;
 
 // Placeholder for Slack Webhook API URL
-String slack_url;
+String slack_url = "https://hooks.slack.com/services/TXXXXXXXXXX/BXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXXX";
 
 /*--------     Main Functions     --------*/
 
