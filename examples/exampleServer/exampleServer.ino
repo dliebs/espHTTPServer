@@ -232,7 +232,7 @@ void setHostname() {
   }
 }
 
-// Save a new message
+// Save a new Slack URL and message
 void setUtilSettings() {
   slack_url = httpServer -> server.arg("SLACK_URL");
   message = httpServer -> server.arg("MESSAGE");
@@ -241,7 +241,7 @@ void setUtilSettings() {
   redirect();
 }
 
-// Save a new Slack URL
+// Save new HTTP server settings
 void setServerSettings() {
   httpServer -> newSettings( httpServer -> server.arg("PAGETITLE"),
                              httpServer -> server.arg("BGCOLOR"),
