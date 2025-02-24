@@ -1,13 +1,6 @@
 //
 //
-//  ESP HTTP Server
-//
-//  ESP8266/32 Based
-//    HTTP Web Server
-//    Customizable colors and styles
-//
-//  Changes From Previous Version
-//    Added returnSetting and newSettings
+//  ESP8266/32 Based HTTP Web Server
 //
 //
 
